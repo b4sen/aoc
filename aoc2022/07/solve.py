@@ -23,22 +23,24 @@ listing = False
 
 with open(sys.argv[1], 'r') as f:
     curr_dir = root_dir
-    for line in f.readlines()[1:]:
+    for line in f.readlines():
         line = line.strip()
+        if line.endswith("cd /"):
+            curr_dir = root_dir
 
-        if line.startswith("$ cd"):
+        elif line.startswith("$ cd"):
             _, cd, dirname = line.split(' ')
             if dirname == '..':
                 curr_dir = curr_dir.parent
             else:
                 curr_dir = curr_dir.children.get(dirname)
 
-        if line.startswith('dir'):
+        elif line.startswith('dir'):
             _, dirname = line.split(' ')
             dir_ = Directory(dirname, curr_dir)
             curr_dir.children[dirname] = dir_
 
-        if not line.startswith("$") and not line.startswith("dir"):
+        elif not line.startswith("$") and not line.startswith("dir"):
             size, fname = line.split(' ')
             f = File(int(size), fname, curr_dir)
             curr_dir.children[fname] = f
@@ -76,6 +78,3 @@ SPACE_DIFF = SPACE_NEEDED - SPACE_AVAILABLE
 
 sizes = filter(lambda x: x >= SPACE_DIFF, sizes)
 print(sorted(sizes)[0])
-
-
-
